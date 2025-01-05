@@ -1,0 +1,32 @@
+{
+  "name": "cross-listing-tool",
+  "version": "1.0.0",
+  "description": "Application to post across multiple sites for second hand clothing sale.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mpatrikios/Cross-Listing-Tool.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mpatrikios/Cross-Listing-Tool/issues"
+  },
+  "homepage": "https://github.com/mpatrikios/Cross-Listing-Tool#readme",
+  "dependencies": {
+    "puppeteer": "^23.11.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/puppeteer": "^5.4.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
