@@ -1,36 +1,66 @@
 //handles data storage
 
-console.log("BACKGROUND SCRIPT LOADED - TEST"); // This should show in the background page console
+interface DepopListing {
+    title?: string;        
+    description: string;   
+    price: number;         
+    images: string[];      
+    condition: string;     
+    size: string;        
+    category: string;      
+}
 
-// Listen for messages from the content script
+let currentListingId: string | null = null;
+
+// Listen for messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    // Check if message is a new listing
+    console.log('Background script received message:', message);
+
     if (message.type === 'NEW_LISTING') {
-        handleNewListing(message.data);
+        handleListingUpdate(message.data);
+        sendResponse({ status: 'received' });
     }
 });
 
-// Handle storing new listing data
-async function handleNewListing(listingData: any) {
+async function handleListingUpdate(listingData: DepopListing) {
     try {
-        // Get currently stored listings from Chrome storage
-        const result = await chrome.storage.local.get('listings');
-        const listings = result.listings || [];
-        
-        // Add new listing with additional metadata
-        listings.push({
-            ...listingData,                    // All the listing data
-            capturedAt: new Date().toISOString(), // When it was captured
-            crossPosted: false                    // Track if it's been posted elsewhere
-        });
+        // If no currentListingId exists, create a new one
+        if (!currentListingId) {
+            currentListingId = generateListingId();
+            console.log('Created new listing ID:', currentListingId);
+        }
 
-        // Save updated listings back to Chrome storage
-        await chrome.storage.local.set({ listings });
+        // Update existing listing data
+        const enhancedListing = {
+            ...listingData,
+            id: currentListingId,
+            lastUpdated: new Date().toISOString(),
+            status: {
+                facebook: 'pending',
+                ebay: 'pending'
+            }
+        };
         
-        // Log success for debugging
-        console.log('Listing saved:', listingData);
+        await chrome.storage.local.set({ 
+            currentListing: enhancedListing 
+        });
+        
+        console.log('Listing updated:', enhancedListing);
     } catch (error) {
-        // Log any errors that occur during storage
-        console.error('Error saving listing:', error);
+        console.error('Error updating listing:', error);
     }
 }
+
+function generateListingId(): string {
+    return 'listing_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Reset currentListingId when navigating away from create page
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.url && !changeInfo.url.includes('/products/create')) {
+        currentListingId = null;
+        console.log('Reset listing ID - left create page');
+    }
+});
+
+console.log('Background script loaded');

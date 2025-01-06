@@ -24,6 +24,7 @@
     "puppeteer": "^23.11.1"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.289",
     "@types/node": "^22.10.5",
     "@types/puppeteer": "^5.4.7",
     "ts-node": "^10.9.2",
